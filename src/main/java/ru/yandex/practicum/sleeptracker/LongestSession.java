@@ -1,6 +1,5 @@
 package ru.yandex.practicum.sleeptracker;
 
-import java.io.FileNotFoundException;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;

@@ -7,18 +7,14 @@ import java.util.function.Function;
 
 public class NightsCounter implements Function<List<SleepingSession>, SleepAnalysisResult> {
 
+    NightSessionUtils nsn = new NightSessionUtils();
+
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
         long nightsCount = sessions.stream()
-                .filter(session -> isNightSession(session))
+                .filter(session -> nsn.isNightSession(session))
                 .count();
 
         return new SleepAnalysisResult("Количество ночей", nightsCount);
-    }
-
-    public boolean isNightSession(SleepingSession session) {
-        return !session.start().toLocalDate().equals(session.end().toLocalDate()) ||
-                session.start().toLocalTime().isAfter(LocalTime.of(22,0)) ||
-                session.end().toLocalTime().isBefore(LocalTime.of(9,0));
     }
 }

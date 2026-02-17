@@ -17,7 +17,6 @@ public class AverageSession implements Function<List<SleepingSession>, SleepAnal
             throw new NoSuchElementException("проблема списка в AverageSession");
         }
 
-
         return new SleepAnalysisResult("средняя продолжительность сна в минутах", averageMinutes);
     }
 }

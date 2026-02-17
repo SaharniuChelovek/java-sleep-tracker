@@ -46,7 +46,7 @@ public class SleepTrackerApp {
     }
 
 
-    private File getFile(String filename) throws FileNotFoundException {
+    public File getFile(String filename) throws FileNotFoundException {
         Path filePath = Paths.get(filename);
         File file = filePath.toFile();
         if (!file.exists()) {
@@ -56,7 +56,7 @@ public class SleepTrackerApp {
         return file;
     }
 
-    private List<SleepingSession> readFile(File file) throws IOException {
+    public List<SleepingSession> readFile(File file) throws IOException {
         try (FileReader fileReader = new FileReader(file, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(fileReader)) {
             return reader.lines()
@@ -66,7 +66,7 @@ public class SleepTrackerApp {
         }
     }
 
-    private Optional<SleepingSession> parseLine(String line) {
+    public Optional<SleepingSession> parseLine(String line) {
         try {
             String[] parts = line.split(SEPARATOR);
             LocalDateTime start = LocalDateTime.parse(parts[0].trim(), LOG_FORMATTER);

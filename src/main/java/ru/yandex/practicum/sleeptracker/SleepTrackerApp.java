@@ -17,7 +17,7 @@ public class SleepTrackerApp {
     private static final String SEPARATOR = ";";
 
 
-    private final List<Function<List<SleepingSession>, SleepAnalysisResult>> ANALYTIC_FUNCTIONS = List.of(
+    private final List<Function<List<SleepingSession>, SleepAnalysisResult>> analyticFunctions = List.of(
             new InsomniaAnalysis(),
             new BadSleepCounter(),
             new NightsCounter(),
@@ -40,7 +40,7 @@ public class SleepTrackerApp {
     }
 
     private List<SleepAnalysisResult> analyzeSessions(List<SleepingSession> sessions) {
-        return ANALYTIC_FUNCTIONS.stream()
+        return analyticFunctions.stream()
                 .map(it -> it.apply(sessions))
                 .toList();
     }

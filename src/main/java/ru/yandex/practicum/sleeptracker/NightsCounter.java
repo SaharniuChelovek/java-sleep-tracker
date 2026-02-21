@@ -5,6 +5,8 @@ import java.util.function.Function;
 
 public class NightsCounter implements Function<List<SleepingSession>, SleepAnalysisResult> {
 
+    static final String FUNCTION_TITLE = "Количество ночей";
+
     NightSessionUtils nsn = new NightSessionUtils();
 
     @Override
@@ -13,6 +15,6 @@ public class NightsCounter implements Function<List<SleepingSession>, SleepAnaly
                 .filter(session -> nsn.isNightSession(session))
                 .count();
 
-        return new SleepAnalysisResult("Количество ночей", nightsCount);
+        return new SleepAnalysisResult(FUNCTION_TITLE, nightsCount);
     }
 }

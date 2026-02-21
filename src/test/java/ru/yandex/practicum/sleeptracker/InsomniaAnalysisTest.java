@@ -1,7 +1,6 @@
 package ru.yandex.practicum.sleeptracker;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -9,60 +8,43 @@ import java.util.List;
 
 public class InsomniaAnalysisTest {
 
-    static List<SleepingSession> sessions;
-    static List<SleepingSession> sessions2;
-    static List<SleepingSession> sessions3;
-    static List<SleepingSession> sessions4;
-    static SleepingSession session1;
-    static SleepingSession session2;
-    static SleepingSession session3;
-    static SleepingSession session4;
-    static SleepingSession session5;
-    static SleepingSession session6;
-    static long zero;
-    static long one;
-    static long two;
     InsomniaAnalysis ia = new InsomniaAnalysis();
 
-    @BeforeAll
-    static void sessionsList() {
-        zero = 0;
-        one = 1;
-        two = 2;
+    @Test
+    void acrossMonthTest() {
 
-        session1 = new SleepingSession(LocalDateTime.of(2025, 10, 10, 5, 45), LocalDateTime.of(2025, 10, 11, 10, 15), SleepRating.GOOD);
-        session2 = new SleepingSession(LocalDateTime.of(2025, 10, 11, 0, 0), LocalDateTime.of(2025, 10, 12, 6, 0), SleepRating.GOOD);
-        session3 = new SleepingSession(LocalDateTime.of(2025, 10, 13, 7, 0), LocalDateTime.of(2025, 10, 13, 14, 0), SleepRating.BAD);
-        session4 = new SleepingSession(LocalDateTime.of(2025, 10, 14, 6, 0), LocalDateTime.of(2025, 10, 15, 13, 0), SleepRating.BAD);
-        session5 = new SleepingSession(LocalDateTime.of(2025, 10, 15, 22, 0), LocalDateTime.of(2025, 10, 16, 5, 0), SleepRating.BAD);
-        session6 = new SleepingSession(LocalDateTime.of(2025, 10, 16, 7, 0), LocalDateTime.of(2025, 10, 16, 18, 0), SleepRating.BAD);
+        List<SleepingSession> sessions = List.of(new SleepingSession(LocalDateTime.of(2024, 1, 31, 23, 30), LocalDateTime.of(2024, 2, 1, 6, 30), SleepRating.GOOD), new SleepingSession(LocalDateTime.of(2024, 2, 1, 23, 45), LocalDateTime.of(2024, 2, 2, 6, 15), SleepRating.GOOD));
 
-        sessions = List.of(session1, session2);
-        sessions2 = List.of(session2, session3);
-        sessions3 = List.of(session6, session3);
-        sessions4 = List.of(session6, session4, session5);
+        SleepAnalysisResult result = ia.apply(sessions);
+
+        Assertions.assertEquals(0L, result.getResult());
     }
 
     @Test
-    void noInsomniaNightsTest() {
-        Assertions.assertEquals(zero, ia.apply(sessions).getResult());
+    void acrossMonthInsomniaTest() {
+
+        List<SleepingSession> sessions = List.of(new SleepingSession(LocalDateTime.of(2024, 1, 31, 12, 0), LocalDateTime.of(2024, 1, 31, 13, 0), SleepRating.BAD), new SleepingSession(LocalDateTime.of(2024, 2, 1, 12, 0), LocalDateTime.of(2024, 2, 1, 13, 0), SleepRating.BAD));
+
+        SleepAnalysisResult result = ia.apply(sessions);
+
+        Assertions.assertEquals(1L, result.getResult());
     }
 
     @Test
-    void oneInsomniaNightTest() {
-        Assertions.assertEquals(one, ia.apply(sessions2).getResult());
+    void acrossMidnightTest() {
+
+        List<SleepingSession> sessions = List.of(new SleepingSession(LocalDateTime.of(2024, 3, 1, 1, 0), LocalDateTime.of(2024, 3, 1, 7, 0), SleepRating.GOOD), new SleepingSession(LocalDateTime.of(2024, 3, 2, 1, 30), LocalDateTime.of(2024, 3, 2, 6, 30), SleepRating.NORMAL));
+
+        SleepAnalysisResult result = ia.apply(sessions);
+
+        Assertions.assertEquals(0L, result.getResult());
+        Assertions.assertEquals(2, sessions.size());
     }
 
     @Test
-    void twoInsomniaNightTest() {
-        Assertions.assertEquals(two, ia.apply(sessions3).getResult());
-    }
+    void emptyListTest() {
+        SleepAnalysisResult result = ia.apply(List.of());
 
-    @Test
-    void oneInsomniaOneUsualNightsTest() {
-        long three = 3;
-        Assertions.assertEquals(one, ia.apply(sessions4).getResult());
-        Assertions.assertEquals(three, sessions4.size());
+        Assertions.assertEquals(0L, result.getResult());
     }
-
 }

@@ -2,10 +2,12 @@ package ru.yandex.practicum.sleeptracker;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import java.util.function.Function;
 
 public class AverageSession implements Function<List<SleepingSession>, SleepAnalysisResult> {
+
+    static final String FUNCTION_TITLE = "средняя продолжительность сна в минутах";
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -13,10 +15,8 @@ public class AverageSession implements Function<List<SleepingSession>, SleepAnal
                 .mapToLong(session -> Duration.between(session.start(), session.end()).toMinutes())
                 .average()
                 .orElse(0.0);
-        if (averageMinutes == 0.0) {
-            throw new NoSuchElementException("проблема списка в AverageSession");
-        }
 
-        return new SleepAnalysisResult("средняя продолжительность сна в минутах", averageMinutes);
+
+        return new SleepAnalysisResult(FUNCTION_TITLE, averageMinutes);
     }
 }

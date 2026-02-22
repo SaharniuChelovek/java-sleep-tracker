@@ -2,11 +2,11 @@ package ru.yandex.practicum.sleeptracker;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.Period;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class InsomniaAnalysis implements Function<List<SleepingSession>, SleepAnalysisResult> {
 
@@ -21,29 +21,42 @@ public class InsomniaAnalysis implements Function<List<SleepingSession>, SleepAn
             return new SleepAnalysisResult(FUNCTION_TITLE, 0L);
         }
 
-        Set<LocalDate> loggedDates = sessions.stream()
-                .map(session -> session.start().toLocalDate())
-                .collect(Collectors.toSet());
+        // 1. Определяем период логирования
+        LocalDateTime firstStart = sessions.get(0).start();
+        LocalDateTime lastEnd = sessions.get(sessions.size() - 1).end();
 
-        long totalNights = loggedDates.stream()
-                .filter(date -> loggedDates.contains(date.plusDays(1)))
-                .count();
+        LocalDate startDate = firstStart.toLocalDate();
+        LocalDate endDate = lastEnd.toLocalDate();
 
-        Set<LocalDate> nightsWithSleep = sessions.stream()
-                .filter(session -> nsu.isNightSession(session))
-                .map(session -> resolveNightDate(session))
-                .collect(Collectors.toSet());
+        // 2. Считаем общее число ночей
+        long totalNights = Period.between(startDate, endDate).getDays();
 
-        long insomniaCount = totalNights -
-                nightsWithSleep.stream()
-                        .filter(date -> loggedDates.contains(date)
-                                && loggedDates.contains(date.minusDays(1)))
-                        .count();
+        // Учитываем первую ночь, если сон начался до 12:00
+        if (firstStart.getHour() < 12) {
+            totalNights++;
+        }
 
-        return new SleepAnalysisResult(FUNCTION_TITLE, insomniaCount);
+        // 3. Считаем ночи со сном
+        Set<LocalDate> sleptNights = new HashSet<>();
+
+        for (SleepingSession session : sessions) {
+            if (!nsu.isNightSession(session)) {
+                continue;
+            }
+
+            // Определяем, к какой ночи относится сон
+            LocalDate nightDate = determineNightDate(session);
+            sleptNights.add(nightDate);
+        }
+
+        // 4. Вычисляем бессонные ночи
+        long sleeplessNights = totalNights - sleptNights.size();
+
+        return new SleepAnalysisResult(FUNCTION_TITLE, sleeplessNights);
     }
 
-    private LocalDate resolveNightDate(SleepingSession session) {
+    //не совсем понял суть этого метода, сон же всегда по сути относится к дате end, разве нет?
+    private LocalDate determineNightDate(SleepingSession session) {
 
         LocalDateTime start = session.start();
         LocalDateTime end = session.end();
@@ -52,11 +65,18 @@ public class InsomniaAnalysis implements Function<List<SleepingSession>, SleepAn
             end = end.plusDays(1);
         }
 
-        if (start.toLocalTime().isBefore(LocalTime.of(6, 0))) {
-            return start.toLocalDate();
-        }
-
-        return start.toLocalDate().plusDays(1);
+        return end.toLocalDate();
     }
 }
-//на 90% уверен что неправильно, но я уже не знаю, как это лучше написать. Простите
+/*я не знаю, может я все это время неправильно понимал суть задания. Я думал от ночей между предпоследней и последней
+ * записью надо избавиться, а в итоге используется метод between, который их считает
+ * может и не надо было от них избавляться
+ * я три недели сижу за 8 спринтом
+ * я провалил все мягкие дедлайны
+ * я провалил жетский дедлайн
+ * я уже взял перенос жесткого дедлайна на 2 недели, чтоб вложить в них 9 спринт, но я ВСЕ ЕЩЕ не могу сдать 8
+ * я уже не уверен, что успею
+ * а при всем этом надо как-то в институте еще учится
+ * меня этот проект уже с ума сводит
+ * я не знаю почему не получается
+ * */
